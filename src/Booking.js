@@ -1,5 +1,9 @@
+// Booking.js
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import TimeSlots from "./TimeSlots";
+import BookingForm from "./BookingForm";
+import Receipt from "./Receipt";
 
 const Booking = () => {
   const baseURL = "http://localhost:8080";
@@ -8,20 +12,10 @@ const Booking = () => {
 
   const [bookings, setBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
-
-  //   const getBookings = async () => {
-  //     await axios
-  //       .get(`${baseURL}/api/v1/booking/from/${startDate}/to/${endDate}`)
-  //       .then((response) => {
-  //         console.log("RESPONSE:", response);
-  //         if (response.status === 200) {
-  //           console.log("DATA:", response.data);
-  //           setBookings(response.data);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.log("ERROR:", error);
-  //       });
+  const [email, setEmail] = useState("");
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isBookingSubmitted, setIsBookingSubmitted] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
 
   const getBookings = async () => {
     try {
@@ -38,70 +32,77 @@ const Booking = () => {
 
   const bookingClickHandler = (booking) => {
     setSelectedBooking(booking);
+    setIsBookingSubmitted(false); // Reset the booking submission status
+    setShowReceipt(false); // Hide receipt after selecting a new time slot
+  };
+
+  const submitHandler = () => {
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValid = emailRegex.test(email);
+
+    if (
+      isValid &&
+      selectedBooking &&
+      !selectedBooking.booked &&
+      !isBookingSubmitted
+    ) {
+      // Update the booking status to "Booked" for the selected time slot
+      const updatedBookings = bookings.map((booking) =>
+        booking.id === selectedBooking.id
+          ? { ...booking, booked: true }
+          : booking
+      );
+      setBookings(updatedBookings);
+
+      setIsEmailValid(true);
+      setIsBookingSubmitted(true);
+      setShowReceipt(true); // Show receipt after successful booking
+    } else {
+      setIsEmailValid(false);
+      setShowReceipt(false); // Hide receipt if the submission fails
+    }
+  };
+
+  const resetBooking = () => {
+    setShowReceipt(false);
+    setIsBookingSubmitted(false);
+    setEmail("");
+    setSelectedBooking(null);
   };
 
   useEffect(() => {
     getBookings();
   }, []);
 
-
-
   return (
     <div>
-      {/* <button type='button' className='btn btn-info' onClick={getBookingsClickHandler}>
-            Click here to get all time slots
-        </button> */}
       <div className="row">
-        {bookings && bookings.length !== 0 && (
-          <h2 className="mb-4">Booking List</h2>
-        )}
-        <div className="row"></div>
-        {bookings.map((booking) => (
-          <div key={booking.id} className="card mb-4 col-md-3">
-            <div className="card-body">
-              <p className="card-text">DateTime: {booking.dateTime}</p>
-            </div>
-            <div className="d-grid card-footer">
-              <button
-                type="button"
-                className={`btn btn-${booking.booked ? "danger" : "success"}`}
-                onClick={() => bookingClickHandler(booking)}
-                disabled={booking.booked}
-              >
-                {booking.booked ? "Booked" : "Available"}
-              </button>
-            </div>
-          </div>
-        ))}
+        <TimeSlots
+          bookings={bookings}
+          onBookingClick={bookingClickHandler}
+          isBookingSubmitted={isBookingSubmitted}
+        />
 
-        <div className="card">
-          <h3>Booking</h3>
-          <div class="mb-3 mt-3">
-            <label for="email" class="form-label">
-              Email:
-            </label>
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              placeholder="Enter email"
-              name="email"
+        <div className="col-md-6">
+          {selectedBooking && !selectedBooking.booked && (
+            <BookingForm
+              onSubmit={submitHandler}
+              isEmailValid={isEmailValid}
+              onEmailChange={(value) => setEmail(value)}
             />
-          </div>
-          <button type="submit" class="btn btn-primary">
-            Submit
-          </button>
-          <div className="card mx-5 my-3">Booking Details</div>
-          {selectedBooking ? (
-            <>
-              <div>ID: {selectedBooking.id}</div>
-              <div>Date: {selectedBooking.dateTime}</div>
-              <div>Time: {selectedBooking.dateTime}</div>
-            </>
-          ) : (
-            <div>No booking selected</div>
           )}
         </div>
+
+        {showReceipt && selectedBooking && (
+          <div className="col-md-6">
+            <Receipt
+              booking={selectedBooking}
+              email={email}
+              onReset={resetBooking}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
