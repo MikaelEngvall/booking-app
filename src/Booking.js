@@ -6,8 +6,8 @@ import Receipt from "./Receipt";
 
 const Booking = () => {
   const baseURL = "http://localhost:8080";
-  const startDate = "2023-12-12";
-  const endDate = "2023-12-12";
+  const startDate = "2023-12-14";
+  const endDate = "2023-12-14";
 
   const [bookings, setBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
