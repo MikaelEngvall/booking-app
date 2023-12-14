@@ -39,7 +39,8 @@ const BookingList = () => {
 
   useEffect(() => {
     getBookings();
-  }, []);
+  }, [bookings]);
+
 
   return (
     <div>
