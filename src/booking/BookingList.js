@@ -3,7 +3,7 @@ import TimeSlot from "./TimeSlot";
 import { baseURL } from "../util/constants";
 import axios from "axios";
 
-const BookingList = () => {
+const BookingList = ({ updateTrigger }) => {
   const [bookings, setBookings] = useState([]);
 
   const formatDate = (date) => {
@@ -12,7 +12,7 @@ const BookingList = () => {
     let year = date.getFullYear();
 
     day = day < 10 ? "0" + day : day;
-    month = day < 10 ? "0" + month : month;
+    month = month < 10 ? "0" + month : month;
 
     return `${year}-${month}-${day}`;
   };
@@ -39,8 +39,7 @@ const BookingList = () => {
 
   useEffect(() => {
     getBookings();
-  }, [bookings]);
-
+  }, [updateTrigger]); // Update the trigger to re-fetch bookings when it changes
 
   return (
     <div>

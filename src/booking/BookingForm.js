@@ -4,7 +4,7 @@ import { baseURL } from "../util/constants";
 import { useNavigate, useParams } from "react-router-dom";
 
 
-const BookingForm = () => {
+const BookingForm = ({ onBookingSubmit }) => {  // Added the call back prop to update the timeslot once booked successfully
   const [email, setEmail] = useState("");
   const [reciept, setReciept] = useState([]);
 
@@ -25,6 +25,7 @@ const BookingForm = () => {
       if (response.status === 201) {
         setReciept(response.data);
         console.log(reciept.data);
+        onBookingSubmit(); // Invoke the callback on successful booking
       }
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -67,7 +68,6 @@ const BookingForm = () => {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
             />
-            {/* <div>{emailValidation ? "" : "Email is invalid"}</div> */}
             <button type="submit" className="btn btn-primary">
               Submit
             </button>
