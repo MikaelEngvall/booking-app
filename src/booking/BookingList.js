@@ -12,7 +12,7 @@ const BookingList = ({ updateTrigger }) => {
     let year = date.getFullYear();
 
     day = day < 10 ? "0" + day : day;
-    month = month < 10 ? "0" + month : month;
+    month = day < 10 ? "0" + month : month;
 
     return `${year}-${month}-${day}`;
   };
@@ -39,7 +39,7 @@ const BookingList = ({ updateTrigger }) => {
 
   useEffect(() => {
     getBookings();
-  }, [updateTrigger]); // Update the trigger to re-fetch bookings when it changes
+  }, [updateTrigger]);
 
   return (
     <div>

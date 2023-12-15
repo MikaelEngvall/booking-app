@@ -3,7 +3,7 @@ import React from 'react';
 const Home = () => {
     return (
         <div>
-            
+            <h1>Welcome to the appoinment booking system!</h1>
         </div>
     );
 };
